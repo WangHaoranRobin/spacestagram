@@ -1,4 +1,5 @@
 export default interface APODCardProps {
+  usrName: string;
   url: string;
   title: string;
   explanation: string;
