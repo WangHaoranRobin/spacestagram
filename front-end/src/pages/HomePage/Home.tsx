@@ -22,14 +22,13 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
   const [cards, setCards] = useState<APODCardProps[]>([]);
   const [viewMode, setViewMode] = useState(0);
   const [inProgress, setInProgress] = useState(false);
+  const classes = useStyles();
 
   useEffect(() => {
     setCards([]);
     getAPODCards();
     console.log(cards.length);
   }, [viewMode]);
-
-  const classes = useStyles();
 
   const getAPODCards = async (): Promise<APODCardProps[]> => {
     setInProgress(true);

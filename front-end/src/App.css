@@ -1,9 +1,9 @@
 body {
-  overflow-x: hidden;
   background-color: #14182e;
 }
 
 .App {
   height: 100%;
+  min-height: 100vh;
   display: "block";
 }

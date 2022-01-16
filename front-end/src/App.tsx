@@ -80,6 +80,7 @@ function App() {
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: "background.default",
+              overflow: "scroll",
             }}
           >
             <LoginBox onLogin={login} />
