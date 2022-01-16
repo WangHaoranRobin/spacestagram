@@ -1,10 +1,11 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useRef } from "react";
 import APODCardProps from "../types/APODCardProps";
 import VideoEmbed from "./VideoEmbed/Video";
 import AnimateHeight from "react-animate-height";
 import loadingGif from "../assets/LoadingEllipsis.gif";
 import { Theme, Stack, Typography, Box, Button } from "@mui/material";
 import { makeStyles, createStyles } from "@mui/styles";
+import { animated, useSpring } from "react-spring";
 
 const axios = require("axios");
 
@@ -12,12 +13,12 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
       backgroundColor: theme.palette.background.paper,
-      borderRadius: 10,
+      borderRadius: "10px",
       overflow: "hidden",
     },
     cardInfo: {
-      paddingLeft: 30,
-      paddingRight: 30,
+      paddingLeft: "30px",
+      paddingRight: "30px",
     },
     cardTitleStripe: {
       display: "flex",
@@ -25,19 +26,24 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
     },
     title: {
-      marginTop: 20,
+      marginTop: "20px",
     },
     explanation: {
-      marginBottom: 20,
+      marginBottom: "20px",
     },
     loadingGif: {
       width: "100%",
-      height: 65,
+      height: "65px",
       objectFit: "contain",
     },
     image: {
       width: "100%",
-      objectFit: "contain",
+      objectFit: "cover",
+      minHeight: "100px",
+      maxHeight: "500px",
+    },
+    likeButton: {
+      marginLeft: "10px",
     },
   })
 );
@@ -55,12 +61,15 @@ const APODCard: FC<APODCardProps> = ({
     console.log(usrName);
     console.log(date);
     axios
-      .get("https://us-central1-spacestagram-b087a.cloudfunctions.net/api/isLiked", {
-        params: {
-          usrName: usrName,
-          APODDate: date,
-        },
-      })
+      .get(
+        "https://us-central1-spacestagram-b087a.cloudfunctions.net/api/isLiked",
+        {
+          params: {
+            usrName: usrName,
+            APODDate: date,
+          },
+        }
+      )
       .then((res: any) => {
         if (res.data) {
           setLiked(true);
@@ -71,14 +80,22 @@ const APODCard: FC<APODCardProps> = ({
         console.log(err.response.data.error);
       });
     if (media_type === "video") {
-      setHeight("auto");
+      setIsImageLoaded(true);
+      // setHeight("auto");
     }
   }, []);
 
   const classes = useStyles();
-
   const [liked, setLiked] = useState(false);
-  const [height, setHeight] = useState<number | string>(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const ref = useRef<any>(null);
+  const [style, animate] = useSpring(() => ({ height: "0px" }), []);
+
+  useEffect(() => {
+    animate({
+      height: (isImageLoaded ? ref.current?.offsetHeight : 0) + "px",
+    });
+  }, [animate, ref, isImageLoaded]);
 
   const clickLikeButton = () => {
     axios
@@ -103,54 +120,62 @@ const APODCard: FC<APODCardProps> = ({
   };
 
   const imageLoaded = () => {
-    setHeight("auto");
+    setIsImageLoaded(true);
   };
 
   return (
     <Stack className={classes.container}>
-      <AnimateHeight duration={500} height={height}>
-        {media_type === "image" ? (
-          <img className={classes.image} src={url} onLoad={imageLoaded} />
-        ) : (
-          <VideoEmbed url={url} />
-        )}
-        <Stack className={classes.cardInfo}>
-          <Stack className={classes.cardTitleStripe} direction='row'>
-            <Stack>
-              <Typography
-                className={classes.title}
-                variant='h6'
-                color='primary'
-              >
-                {title}
-              </Typography>
-              <Typography variant='subtitle1' color='primary'>
-                {date}
-              </Typography>
-            </Stack>
-            <Button
-              className='like-button'
-              onClick={clickLikeButton}
-              variant={liked ? "contained" : "outlined"}
-              color={liked ? "secondary" : "primary"}
-            >
-              {liked ? "Unlike" : "Like"}
-            </Button>
-          </Stack>
-          <Typography
-            className={classes.explanation}
-            variant='body1'
-            color='primary'
-          >
-            {explanation}
-          </Typography>
-        </Stack>
-      </AnimateHeight>
       <img
         className={classes.loadingGif}
         src={loadingGif}
-        hidden={height != 0}
+        hidden={isImageLoaded}
       />
+      <animated.div
+        style={{
+          overflow: "hidden",
+          width: "100%",
+          ...style,
+        }}
+      >
+        <div ref={ref}>
+          {media_type === "image" ? (
+            <img className={classes.image} src={url} onLoad={imageLoaded} />
+          ) : (
+            <VideoEmbed url={url} />
+          )}
+          <Stack className={classes.cardInfo}>
+            <Stack className={classes.cardTitleStripe} direction='row'>
+              <Stack>
+                <Typography
+                  className={classes.title}
+                  variant='h6'
+                  color='primary'
+                >
+                  {title}
+                </Typography>
+                <Typography variant='subtitle1' color='primary'>
+                  {date}
+                </Typography>
+              </Stack>
+              <Button
+                className={classes.likeButton}
+                onClick={clickLikeButton}
+                variant={liked ? "contained" : "outlined"}
+                color={liked ? "secondary" : "primary"}
+              >
+                {liked ? "Unlike" : "Like"}
+              </Button>
+            </Stack>
+            <Typography
+              className={classes.explanation}
+              variant='body1'
+              color='primary'
+            >
+              {explanation}
+            </Typography>
+          </Stack>
+        </div>
+      </animated.div>
     </Stack>
   );
 };

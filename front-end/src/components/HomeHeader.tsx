@@ -9,9 +9,51 @@ import {
   ToggleButtonGroup,
   Toolbar,
   LinearProgress,
+  Theme,
+  Hidden,
+  Drawer,
+  IconButton,
+  useMediaQuery,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
+import { makeStyles, createStyles, useTheme } from "@mui/styles";
 
 const axios = require("axios");
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    appBar: {
+      paddingTop: "10px",
+      paddingBottom: "10px",
+      paddingLeft: "20px",
+    },
+    subtitles: {
+      flexGrow: 1,
+      marginLeft: "10px",
+      marginRight: "10px",
+    },
+    drawerPaper: {
+      width: "350px",
+    },
+    closeMenuButton: {
+      marginRight: "auto",
+      marginLeft: 0,
+    },
+    toolbar: theme.mixins.toolbar,
+    menuButton: {
+      marginRight: theme.spacing(2),
+      [theme.breakpoints.up("lg")]: {
+        display: "none",
+      },
+    },
+    modeButtons: {
+      marginLeft: "10px",
+      marginRight: "10px",
+      marginBottom: "10px",
+    },
+  })
+);
 
 const HomeHeader: FC<HomeHeaderProps> = ({
   usrName,
@@ -30,7 +72,10 @@ const HomeHeader: FC<HomeHeaderProps> = ({
     getIP();
   }, []);
 
+  const classes = useStyles();
+  const isSmallScreen = useMediaQuery("(max-width:1280px)");
   const [alignment, setAlignment] = useState(ViewMode.RandomPicture);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleAlignment = (
     event: React.MouseEvent<HTMLElement>,
@@ -40,51 +85,100 @@ const HomeHeader: FC<HomeHeaderProps> = ({
     if (newAlignment != null) {
       setAlignment(newAlignment);
       onModeChange(newAlignment);
+      setIsOpen(false);
     }
   };
+
+  const handleDrawerToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const subtitle = (
+    <Box className={classes.subtitles}>
+      <Typography variant='subtitle2' color='primary'>
+        Launched from NASA APOD API
+      </Typography>
+      <Typography variant='subtitle2' color='primary'>
+        Landed at: {ip}
+      </Typography>
+      <Typography variant='subtitle2' color='primary'>
+        Logged in as: {usrName}
+      </Typography>
+    </Box>
+  );
+
+  const modeButtonGroup = (
+    <ToggleButtonGroup
+      value={alignment}
+      exclusive
+      onChange={handleAlignment}
+      className={classes.modeButtons}
+    >
+      <ToggleButton value={ViewMode.RandomPicture}>
+        Random Pictures
+      </ToggleButton>
+      <ToggleButton value={ViewMode.MostRecent}>Most Recent</ToggleButton>
+      <ToggleButton value={ViewMode.Liked}>Liked</ToggleButton>
+    </ToggleButtonGroup>
+  );
+
   return (
     <Box sx={{ width: "100%" }}>
-      <AppBar
-        sx={{
-          paddingTop: 2,
-          paddingBottom: 2,
-          paddingLeft: 3,
-        }}
-        position='fixed'
-      >
-        <Toolbar>
-          <Typography variant='h4' color='primary' sx={{ mr: 2 }}>
-            Spacestagram
-          </Typography>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant='subtitle2' color='primary'>
-              Launched from NASA Astronomy Picture of the Day API
+      <AppBar className={classes.appBar} position='fixed'>
+        <Hidden lgUp implementation='css'>
+          <Toolbar>
+            <IconButton
+              color='inherit'
+              aria-label='open drawer'
+              edge='start'
+              onClick={handleDrawerToggle}
+              className={classes.menuButton}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant='h6' noWrap>
+              Spacestagram
             </Typography>
-            <Typography variant='subtitle2' color='primary'>
-              Landed at: {ip}
+          </Toolbar>
+        </Hidden>
+        <Hidden lgDown implementation='css'>
+          <Toolbar>
+            <Typography variant='h4' color='primary' sx={{ mr: 2 }}>
+              Spacestagram
             </Typography>
-            <Typography variant='subtitle2' color='primary'>
-              Logged in as: {usrName}
-            </Typography>
-          </Box>
-          <ToggleButtonGroup
-            value={alignment}
-            exclusive
-            onChange={handleAlignment}
-          >
-            <ToggleButton value={ViewMode.RandomPicture}>
-              Random Pictures
-            </ToggleButton>
-            <ToggleButton value={ViewMode.MostRecent}>Most Recent</ToggleButton>
-            <ToggleButton value={ViewMode.Liked}>Liked</ToggleButton>
-          </ToggleButtonGroup>
-        </Toolbar>
+            {subtitle}
+            {modeButtonGroup}
+          </Toolbar>
+        </Hidden>
         {inProgress && (
           <Box sx={{ marginRight: 6 }}>
             <LinearProgress />
           </Box>
         )}
       </AppBar>
+      <Hidden lgUp implementation='css'>
+        <Drawer
+          variant='temporary'
+          anchor='left'
+          open={isOpen && isSmallScreen}
+          onClose={handleDrawerToggle}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+        >
+          <IconButton
+            onClick={handleDrawerToggle}
+            className={classes.closeMenuButton}
+          >
+            <CloseIcon />
+          </IconButton>
+          {modeButtonGroup}
+          {subtitle}
+        </Drawer>
+      </Hidden>
     </Box>
   );
 };

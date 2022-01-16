@@ -15,14 +15,14 @@ const axios = require("axios");
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     container: {
-      width: 300,
+      width: "300px",
       height: "auto",
-      borderRadius: 10,
+      borderRadius: "10px",
       backgroundColor: theme.palette.background.paper,
       display: "flex",
       flexDirection: "column",
       alignItems: "stretch",
-      padding: 20,
+      padding: "20px",
     },
   })
 );

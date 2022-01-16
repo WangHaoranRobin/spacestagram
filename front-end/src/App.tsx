@@ -19,6 +19,7 @@ declare module "@mui/material/styles" {
     };
     Typography: {
       fontFamily: string[];
+      fontSize: number;
     };
   }
   // allow configuration using `createTheme`
@@ -35,6 +36,7 @@ declare module "@mui/material/styles" {
     };
     Typography?: {
       fontFamily?: string[];
+      fontSize?: number;
     };
   }
 }

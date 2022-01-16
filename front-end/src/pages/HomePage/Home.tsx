@@ -7,9 +7,16 @@ import HomePageProps from "../../types/HomePageProps";
 import ViewMode from "../../types/ViewMode";
 import Masonry from "react-masonry-css";
 import "./Home.css";
-import { Box } from "@mui/material";
+import { Box, Theme } from "@mui/material";
+import { makeStyles, createStyles } from "@mui/styles";
 
 const axios = require("axios");
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    toolbar: theme.mixins.toolbar,
+  })
+);
 
 const Home: FC<HomePageProps> = ({ usrName }) => {
   const [cards, setCards] = useState<APODCardProps[]>([]);
@@ -21,6 +28,8 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
     getAPODCards();
     console.log(cards.length);
   }, [viewMode]);
+
+  const classes = useStyles();
 
   const getAPODCards = async (): Promise<APODCardProps[]> => {
     setInProgress(true);
@@ -97,8 +106,8 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
                 };
               })
             );
-            setInProgress(false);
           }
+          setInProgress(false);
         })
         .catch((err: any) => {
           console.log("Error when saving application data: " + err);
@@ -134,6 +143,7 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
         inProgress={inProgress}
         onModeChange={changeViewMode}
       />
+      <div className={classes.toolbar}></div>
       {cards.length && (
         <Masonry
           breakpointCols={breakpoints}
