@@ -102,7 +102,7 @@ exports.getLiked = async (req: any, res: any) => {
       );
       console.log(APODs);
       res.json(APODs);
-    } else res.json(false);
+    } else res.json([]);
   } catch (err) {
     console.log("Something went wrong");
     res.status(500).json({error: `something went wrong: ${err}`});
