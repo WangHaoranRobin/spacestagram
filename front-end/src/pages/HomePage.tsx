@@ -1,12 +1,12 @@
-import { FC, useState, useEffect } from "react";
-import APODCard from "../../components/APODCard";
-import HomeHeader from "../../components/HomeHeader";
-import APODCardProps from "../../types/APODCardProps";
-import UrlType from "../../types/UrlType";
-import HomePageProps from "../../types/HomePageProps";
-import ViewMode from "../../types/ViewMode";
+import React, { FC, useState, useEffect, useContext } from "react";
+import APODCard from "../components/APODCard";
+import HomeHeader from "../components/HomeHeader";
+import APODCardProps from "../types/APODCardProps";
+import UrlType from "../types/UrlType";
+import ViewMode from "../types/ViewMode";
+import { UserNameContext } from "../context/ContextConfig";
 import Masonry from "react-masonry-css";
-import "./Home.css";
+import "./HomePage.css";
 import { Box, Theme } from "@mui/material";
 import { makeStyles, createStyles } from "@mui/styles";
 
@@ -18,10 +18,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Home: FC<HomePageProps> = ({ usrName }) => {
+const Home = () => {
   const [cards, setCards] = useState<APODCardProps[]>([]);
   const [viewMode, setViewMode] = useState(0);
   const [inProgress, setInProgress] = useState(false);
+  const [userName, setUserName] = useContext(UserNameContext);
   const classes = useStyles();
 
   useEffect(() => {
@@ -89,7 +90,7 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
       axios
         .get(
           "https://us-central1-spacestagram-b087a.cloudfunctions.net/api/getLiked",
-          { params: { usrName: usrName } }
+          { params: { usrName: userName } }
         )
         .then((res: any) => {
           console.log(res.data);
@@ -136,9 +137,9 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
   };
 
   return (
-    <Box>
+    <React.Fragment>
       <HomeHeader
-        usrName={usrName}
+        usrName={userName}
         inProgress={inProgress}
         onModeChange={changeViewMode}
       />
@@ -152,7 +153,7 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
           {cards.map((card: APODCardProps) => (
             <APODCard
               key={card.date}
-              usrName={usrName}
+              usrName={userName}
               date={card.date}
               explanation={card.explanation}
               media_type={card.media_type}
@@ -162,7 +163,7 @@ const Home: FC<HomePageProps> = ({ usrName }) => {
           ))}
         </Masonry>
       )}
-    </Box>
+    </React.Fragment>
   );
 };
 

@@ -1,9 +1,10 @@
-import React, { FC, useState, useEffect, useRef } from "react";
+import { FC, useState, useEffect, useRef, useContext } from "react";
 import APODCardProps from "../types/APODCardProps";
-import VideoEmbed from "./VideoEmbed/Video";
-import AnimateHeight from "react-animate-height";
+import VideoEmbed from "./VideoEmbedded";
 import loadingGif from "../assets/LoadingEllipsis.gif";
-import { Theme, Stack, Typography, Box, Button } from "@mui/material";
+import { ShowAlertContext } from "../context/ContextConfig";
+import { Theme, Stack, Typography, Button, IconButton } from "@mui/material";
+import ShareIcon from "@mui/icons-material/Share";
 import { makeStyles, createStyles } from "@mui/styles";
 import { animated, useSpring } from "react-spring";
 
@@ -19,6 +20,8 @@ const useStyles = makeStyles((theme: Theme) =>
     cardInfo: {
       paddingLeft: "30px",
       paddingRight: "30px",
+      paddingTop: "20px",
+      paddingBottom: "20px",
     },
     cardTitleStripe: {
       display: "flex",
@@ -55,33 +58,36 @@ const APODCard: FC<APODCardProps> = ({
   explanation,
   date,
   media_type,
+  noInteraction,
 }) => {
   useEffect(() => {
     // Check if the APOD is liked
     console.log(usrName);
     console.log(date);
-    axios
-      .get(
-        "https://us-central1-spacestagram-b087a.cloudfunctions.net/api/isLiked",
-        {
-          params: {
-            usrName: usrName,
-            APODDate: date,
-          },
-        }
-      )
-      .then((res: any) => {
-        if (res.data) {
-          setLiked(true);
-        }
-      })
-      .catch((err: any) => {
-        console.log("Error when saving application data: " + err);
-        console.log(err.response.data.error);
-      });
-    if (media_type === "video") {
-      setIsImageLoaded(true);
-      // setHeight("auto");
+    if (usrName && !noInteraction) {
+      axios
+        .get(
+          "https://us-central1-spacestagram-b087a.cloudfunctions.net/api/isLiked",
+          {
+            params: {
+              usrName: usrName,
+              APODDate: date,
+            },
+          }
+        )
+        .then((res: any) => {
+          if (res.data) {
+            setLiked(true);
+          }
+        })
+        .catch((err: any) => {
+          console.log("Error when saving application data: " + err);
+          console.log(err.response.data.error);
+        });
+      if (media_type === "video") {
+        setIsImageLoaded(true);
+        // setHeight("auto");
+      }
     }
   }, []);
 
@@ -90,6 +96,7 @@ const APODCard: FC<APODCardProps> = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const ref = useRef<any>(null);
   const [style, animate] = useSpring(() => ({ height: "0px" }), []);
+  const [showAlert, setShowAlert] = useContext(ShowAlertContext);
 
   useEffect(() => {
     animate({
@@ -117,6 +124,14 @@ const APODCard: FC<APODCardProps> = ({
         console.log(err.response.data.error);
       });
     setLiked(!liked);
+  };
+
+  const clickShareButton = () => {
+    // copy to clipboard https://wanghaoranrobin.github.io/spacestagram/share/${APODDate}
+    navigator.clipboard.writeText(
+      `https://wanghaoranrobin.github.io/spacestagram/share/${date}`
+    );
+    setShowAlert(true);
   };
 
   const imageLoaded = () => {
@@ -157,14 +172,21 @@ const APODCard: FC<APODCardProps> = ({
                   {date}
                 </Typography>
               </Stack>
-              <Button
-                className={classes.likeButton}
-                onClick={clickLikeButton}
-                variant={liked ? "contained" : "outlined"}
-                color={liked ? "secondary" : "primary"}
-              >
-                {liked ? "Unlike" : "Like"}
-              </Button>
+              {!noInteraction && (
+                <Stack direction='row' spacing={1}>
+                  <Button
+                    className={classes.likeButton}
+                    onClick={clickLikeButton}
+                    variant={liked ? "contained" : "outlined"}
+                    color={liked ? "secondary" : "primary"}
+                  >
+                    {liked ? "Unlike" : "Like"}
+                  </Button>
+                  <IconButton color='primary' onClick={clickShareButton}>
+                    <ShareIcon />
+                  </IconButton>
+                </Stack>
+              )}
             </Stack>
             <Typography
               className={classes.explanation}

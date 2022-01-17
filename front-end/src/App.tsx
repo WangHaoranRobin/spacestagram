@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-import Home from "./pages/HomePage/Home";
-import LoginBox from "./components/LoginBox";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
+import { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Home from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SharePage from "./pages/SharePage";
+import { UserNameContext, ShowAlertContext } from "./context/ContextConfig";
+import RequireAuth from "./components/RequireAuth";
+import LinkAlert from "./components/LinkAlert";
 import "./App.css";
 
 declare module "@mui/material/styles" {
@@ -59,34 +63,31 @@ const theme = createTheme({
 
 function App() {
   const [usrName, setUsrName] = useState("");
-
-  const login = (usrName: string) => {
-    setUsrName(usrName);
-  };
+  const [doesShowLinkAlert, setDoesShowLinkAlert] = useState(false);
 
   return (
     <div className='App'>
-      <ThemeProvider theme={theme}>
-        {usrName ? (
-          <Home usrName={usrName} />
-        ) : (
-          <Box
-            sx={{
-              position: "absolute",
-              opacity: 1,
-              height: "100%",
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "background.default",
-              overflow: "scroll",
-            }}
-          >
-            <LoginBox onLogin={login} />
-          </Box>
-        )}
-      </ThemeProvider>
+      <UserNameContext.Provider value={[usrName, setUsrName]}>
+        <ShowAlertContext.Provider
+          value={[doesShowLinkAlert, setDoesShowLinkAlert]}
+        >
+          <ThemeProvider theme={theme}>
+            <LinkAlert />
+            <Routes>
+              <Route
+                path='/'
+                element={
+                  <RequireAuth>
+                    <Home />
+                  </RequireAuth>
+                }
+              />
+              <Route path='/login' element={<LoginPage />} />
+              <Route path='/share/:APODDate' element={<SharePage />} />
+            </Routes>
+          </ThemeProvider>
+        </ShowAlertContext.Provider>
+      </UserNameContext.Provider>
     </div>
   );
 }

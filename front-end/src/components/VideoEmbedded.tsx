@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import "./Video.css";
+import "./VideoEmbedded.css";
 
 interface VideoProps {
   url: string;

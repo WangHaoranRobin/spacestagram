@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { BrowserRouter } from "react-router-dom";
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -22,9 +23,9 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 ReactDOM.render(
-  <React.StrictMode>
+  <BrowserRouter>
     <App />
-  </React.StrictMode>,
+  </BrowserRouter>,
   document.getElementById("root")
 );
 
