@@ -148,7 +148,10 @@ const Home = () => {
             setCards(
               res.data.map((card: any) => {
                 return {
-                  url: card.url,
+                  url:
+                    urlType(card.hdurl) === UrlType.Other
+                      ? card.url
+                      : card.hdurl,
                   title: card.title,
                   explanation: card.explanation,
                   date: card.date,

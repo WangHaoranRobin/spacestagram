@@ -11,7 +11,7 @@ const LinkAlert = () => {
     <Collapse
       sx={{
         width: "90%",
-        position: "absolute",
+        position: "fixed",
         bottom: "10px",
         left: "5%",
       }}
