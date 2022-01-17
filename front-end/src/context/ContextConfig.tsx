@@ -1,9 +1,10 @@
 import { createContext } from "react";
+import ContextType from "../types/ContextType";
 
-export const UserNameContext = createContext<
-  [string, React.Dispatch<React.SetStateAction<string>>]
->(["", () => {}]);
+const Context = createContext<ContextType>({
+  UserNameContext: ["", () => {}],
+  ShowAlertContext: [false, () => {}],
+  ModeDisabledContext: [false, () => {}],
+});
 
-export const ShowAlertContext = createContext<
-  [boolean, React.Dispatch<React.SetStateAction<boolean>>]
->([false, () => {}]);
+export default Context;

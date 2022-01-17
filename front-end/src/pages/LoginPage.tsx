@@ -9,7 +9,7 @@ import {
   Theme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { UserNameContext } from "../context/ContextConfig";
+import Context from "../context/ContextConfig";
 
 const axios = require("axios");
 
@@ -39,10 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const LoginPage = () => {
-  const [userName, setUserName] = useContext(UserNameContext);
+  const {
+    UserNameContext: [userName, setUserName],
+  } = useContext(Context);
   const classes = useStyles();
   const navigate = useNavigate();
-
   const [textFieldInput, setTextFieldInput] = useState("");
 
   const login = () => {
@@ -54,8 +55,8 @@ const LoginPage = () => {
         )
         .then((res: any) => {
           console.log("Successfully saved data!");
-          console.log(res.data);
           setUserName(textFieldInput);
+          localStorage.setItem("userName", textFieldInput);
           navigate("/");
         })
         .catch((err: any) => {

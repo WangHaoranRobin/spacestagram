@@ -4,8 +4,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Home from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SharePage from "./pages/SharePage";
-import { UserNameContext, ShowAlertContext } from "./context/ContextConfig";
-import RequireAuth from "./components/RequireAuth";
+import Context from "./context/ContextConfig";
+import ContextType from "./types/ContextType";
 import LinkAlert from "./components/LinkAlert";
 import "./App.css";
 
@@ -64,30 +64,26 @@ const theme = createTheme({
 function App() {
   const [usrName, setUsrName] = useState("");
   const [doesShowLinkAlert, setDoesShowLinkAlert] = useState(false);
+  const [isModeButtonsDisabled, setIsModeButtonsDisabled] = useState(false);
+
+  const AppContext: ContextType = {
+    UserNameContext: [usrName, setUsrName],
+    ShowAlertContext: [doesShowLinkAlert, setDoesShowLinkAlert],
+    ModeDisabledContext: [isModeButtonsDisabled, setIsModeButtonsDisabled],
+  };
 
   return (
     <div className='App'>
-      <UserNameContext.Provider value={[usrName, setUsrName]}>
-        <ShowAlertContext.Provider
-          value={[doesShowLinkAlert, setDoesShowLinkAlert]}
-        >
-          <ThemeProvider theme={theme}>
-            <LinkAlert />
-            <Routes>
-              <Route
-                path='/'
-                element={
-                  <RequireAuth>
-                    <Home />
-                  </RequireAuth>
-                }
-              />
-              <Route path='/login' element={<LoginPage />} />
-              <Route path='/share/:APODDate' element={<SharePage />} />
-            </Routes>
-          </ThemeProvider>
-        </ShowAlertContext.Provider>
-      </UserNameContext.Provider>
+      <Context.Provider value={AppContext}>
+        <ThemeProvider theme={theme}>
+          <LinkAlert />
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/share/:APODDate' element={<SharePage />} />
+          </Routes>
+        </ThemeProvider>
+      </Context.Provider>
     </div>
   );
 }

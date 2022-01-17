@@ -1,6 +1,7 @@
-import React, { useEffect, useState, FC } from "react";
+import React, { useEffect, useState, FC, useContext } from "react";
 import HomeHeaderProps from "../types/HomeHeaderProps";
 import ViewMode from "../types/ViewMode";
+import Context from "../context/ContextConfig";
 import {
   AppBar,
   Box,
@@ -14,10 +15,12 @@ import {
   Drawer,
   IconButton,
   useMediaQuery,
+  Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import { makeStyles, createStyles, useTheme } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
 
 const axios = require("axios");
 
@@ -60,6 +63,14 @@ const HomeHeader: FC<HomeHeaderProps> = ({
   onModeChange,
   inProgress,
 }) => {
+  const classes = useStyles();
+  const isSmallScreen = useMediaQuery("(max-width:1280px)");
+  const [alignment, setAlignment] = useState(ViewMode.RandomPicture);
+  const [isOpen, setIsOpen] = useState(false);
+  const {
+    ModeDisabledContext: [isButtonsDisabled, setIsButtonsDisabled],
+  } = useContext(Context);
+  const navigate = useNavigate();
   const [ip, setIP] = useState("");
 
   //creating function to load ip address from the API
@@ -72,16 +83,10 @@ const HomeHeader: FC<HomeHeaderProps> = ({
     getIP();
   }, []);
 
-  const classes = useStyles();
-  const isSmallScreen = useMediaQuery("(max-width:1280px)");
-  const [alignment, setAlignment] = useState(ViewMode.RandomPicture);
-  const [isOpen, setIsOpen] = useState(false);
-
   const handleAlignment = (
     event: React.MouseEvent<HTMLElement>,
     newAlignment: number
   ) => {
-    console.log(newAlignment);
     if (newAlignment != null) {
       setAlignment(newAlignment);
       onModeChange(newAlignment);
@@ -91,6 +96,11 @@ const HomeHeader: FC<HomeHeaderProps> = ({
 
   const handleDrawerToggle = () => {
     setIsOpen(!isOpen);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("userName");
+    navigate("/login");
   };
 
   const subtitle = (
@@ -113,6 +123,7 @@ const HomeHeader: FC<HomeHeaderProps> = ({
       exclusive
       onChange={handleAlignment}
       className={classes.modeButtons}
+      disabled={isButtonsDisabled}
     >
       <ToggleButton value={ViewMode.RandomPicture}>
         Random Pictures
@@ -120,6 +131,12 @@ const HomeHeader: FC<HomeHeaderProps> = ({
       <ToggleButton value={ViewMode.MostRecent}>Most Recent</ToggleButton>
       <ToggleButton value={ViewMode.Liked}>Liked</ToggleButton>
     </ToggleButtonGroup>
+  );
+
+  const logoutButton = (
+    <Button color='error' onClick={logout}>
+      Logout
+    </Button>
   );
 
   return (
@@ -148,6 +165,7 @@ const HomeHeader: FC<HomeHeaderProps> = ({
             </Typography>
             {subtitle}
             {modeButtonGroup}
+            {logoutButton}
           </Toolbar>
         </Hidden>
         {inProgress && (
@@ -177,6 +195,7 @@ const HomeHeader: FC<HomeHeaderProps> = ({
           </IconButton>
           {modeButtonGroup}
           {subtitle}
+          {logoutButton}
         </Drawer>
       </Hidden>
     </Box>

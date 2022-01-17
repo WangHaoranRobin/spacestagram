@@ -2,7 +2,7 @@ import { FC, useState, useEffect, useRef, useContext } from "react";
 import APODCardProps from "../types/APODCardProps";
 import VideoEmbed from "./VideoEmbedded";
 import loadingGif from "../assets/LoadingEllipsis.gif";
-import { ShowAlertContext } from "../context/ContextConfig";
+import Context from "../context/ContextConfig";
 import { Theme, Stack, Typography, Button, IconButton } from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import { makeStyles, createStyles } from "@mui/styles";
@@ -62,8 +62,6 @@ const APODCard: FC<APODCardProps> = ({
 }) => {
   useEffect(() => {
     // Check if the APOD is liked
-    console.log(usrName);
-    console.log(date);
     if (usrName && !noInteraction) {
       axios
         .get(
@@ -96,7 +94,9 @@ const APODCard: FC<APODCardProps> = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const ref = useRef<any>(null);
   const [style, animate] = useSpring(() => ({ height: "0px" }), []);
-  const [showAlert, setShowAlert] = useContext(ShowAlertContext);
+  const {
+    ShowAlertContext: [showAlert, setShowAlert],
+  } = useContext(Context);
 
   useEffect(() => {
     animate({
@@ -117,7 +117,6 @@ const APODCard: FC<APODCardProps> = ({
       )
       .then((res: any) => {
         console.log("Successfully saved data!");
-        console.log(res.data);
       })
       .catch((err: any) => {
         console.log("Error when saving application data: " + err);

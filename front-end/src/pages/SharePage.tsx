@@ -17,7 +17,6 @@ const SharePage = () => {
         { params: { date: params.APODDate } }
       )
       .then((response: any) => {
-        console.log(response.data);
         // Make an APODCardProps from the response
         setCard({
           usrName: params.usrName,
@@ -39,6 +38,7 @@ const SharePage = () => {
         justifyContent: "center",
         display: "flex",
         paddingTop: "50px",
+        paddingBottom: "50px",
       }}
     >
       <Stack>

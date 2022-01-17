@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import { Alert, AlertTitle, IconButton, Collapse } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { ShowAlertContext } from "../context/ContextConfig";
+import Context from "../context/ContextConfig";
 
 const LinkAlert = () => {
-  const [showAlert, setShowAlert] = useContext(ShowAlertContext);
+  const {
+    ShowAlertContext: [showAlert, setShowAlert],
+  } = useContext(Context);
   return (
     <Collapse
       sx={{
