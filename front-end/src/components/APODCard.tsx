@@ -126,9 +126,8 @@ const APODCard: FC<APODCardProps> = ({
   };
 
   const clickShareButton = () => {
-    // copy to clipboard https://wanghaoranrobin.github.io/spacestagram/share/${APODDate}
     navigator.clipboard.writeText(
-      `https://wanghaoranrobin.github.io/spacestagram/share/${date}`
+      `https://wanghaoranrobin.github.io/spacestagram#/share/${date}`
     );
     setShowAlert(true);
   };
